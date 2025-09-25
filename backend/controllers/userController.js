@@ -35,6 +35,24 @@ const userController = {
         }
     },
 
+    // Get logged-in user profile
+    getLoggedInUser: async (req, res) => {
+        try {
+            const user = await User.findById(req.user.id).select('-password');
+            if (!user) return res.status(404).json({
+                status: "fail",
+                message: 'User not found'
+            });
+            res.json({
+                status: "success",
+                message: "User retrieved successfully",
+                data: user
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
     // Create new user
     createUser: async (req, res) => {
         try {
@@ -85,6 +103,30 @@ const userController = {
         }
     },
 
+    // Update user profile
+    updateLoggedInUser: async (req, res) => {
+        try {
+            const { name, email } = req.body;
+            const updatedUser = await User.findByIdAndUpdate(
+                req.user.id,
+                { name, email },
+                { new: true }
+            ).select('-password');
+
+            if (!updatedUser) return res.status(404).json({
+                status: "fail",
+                message: 'User not found'
+            });
+            res.json({
+                status: "success",
+                message: 'User updated successfully',
+                user: updatedUser
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
+
     // Delete user by ID
     deleteUser: async (req, res) => {
         try {
@@ -104,6 +146,23 @@ const userController = {
         }
     },
 
+    // Delete logged-in user profile
+    deleteLoggedInUser: async (req, res) => {
+        try {
+            const deletedUser = await User.findByIdAndDelete(req.user.id);
+            if (!deletedUser) return res.status(404).json({
+                status: "fail",
+                message: 'User not found'
+            });
+
+            res.json({
+                status: "success",
+                message: 'User deleted successfully'
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    },
 
 };
 

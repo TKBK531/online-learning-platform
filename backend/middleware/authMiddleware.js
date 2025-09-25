@@ -24,4 +24,23 @@ const auth = async (req, res, next) => {
     next();
 };
 
-module.exports = auth;
+const authorize = (...roles) => {
+    return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                status: 'fail',
+                message: 'Not authenticated'
+            });
+        }
+
+        if (!roles.includes(req.user.role)) {
+            return res.status(403).json({
+                status: 'fail',
+                message: 'Access denied. Admin privileges required'
+            });
+        }
+        next();
+    };
+};
+
+module.exports = { auth, authorize };

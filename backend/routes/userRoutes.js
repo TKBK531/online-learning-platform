@@ -15,6 +15,10 @@ router.post('/', userController.createUser);
 router.put('/:id', userController.updateUser);
 
 // DELETE user by ID - /api/users/:id
-router.delete('/:id', userController.deleteUser);
+router.delete('/:id', userController.deleteUser());
+
+// User Login - /api/users/login
+router.post('/login', userController.login);
+
 
 module.exports = router;

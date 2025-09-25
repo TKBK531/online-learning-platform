@@ -5,7 +5,11 @@ const userController = {
     getAllUsers: async (req, res) => {
         try {
             const users = await User.find().select('-password');
-            res.json(users);
+            res.json({
+                status: "success",
+                message: "Users retrieved successfully",
+                data: users
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -15,8 +19,17 @@ const userController = {
     getUserById: async (req, res) => {
         try {
             const user = await User.findById(req.params.id).select('-password');
-            if (!user) return res.status(404).json({ message: 'User not found' });
-            res.json(user);
+            if (!user) return res.status(404).json(
+                {
+                    status: "fail",
+                    message: 'User not found'
+                }
+            );
+            res.json({
+                status: "success",
+                message: "User retrieved successfully",
+                data: user
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -26,9 +39,23 @@ const userController = {
     createUser: async (req, res) => {
         try {
             const { name, email, password, role } = req.body;
+
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(400).json({
+                    status: "fail",
+                    message: "A user with this email already exists"
+                });
+            }
+
             const newUser = new User({ name, email, password, role });
             await newUser.save();
-            res.status(201).json({ message: 'User created successfully' });
+            res.status(201).json(
+                {
+                    status: "success",
+                    message: 'User created successfully'
+                }
+            );
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -37,14 +64,22 @@ const userController = {
     // Update user by ID
     updateUser: async (req, res) => {
         try {
-            const { name, email, role } = req.body;
+            const { name, email } = req.body;
             const updatedUser = await User.findByIdAndUpdate(
                 req.params.id,
-                { name, email, role },
+                { name, email },
                 { new: true }
             ).select('-password');
-            if (!updatedUser) return res.status(404).json({ message: 'User not found' });
-            res.json({ message: 'User updated successfully', user: updatedUser });
+
+            if (!updatedUser) return res.status(404).json({
+                status: "fail",
+                message: 'User not found'
+            });
+            res.json({
+                status: "success",
+                message: 'User updated successfully',
+                user: updatedUser
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }
@@ -54,8 +89,16 @@ const userController = {
     deleteUser: async (req, res) => {
         try {
             const deletedUser = await User.findByIdAndDelete(req.params.id);
-            if (!deletedUser) return res.status(404).json({ message: 'User not found' });
-            res.json({ message: 'User deleted successfully' });
+
+            if (!deletedUser) return res.status(404).json({
+                status: "fail",
+                message: 'User not found'
+            });
+
+            res.json({
+                status: "success",
+                message: 'User deleted successfully'
+            });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

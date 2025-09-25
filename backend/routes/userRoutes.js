@@ -1,20 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
+const { adminOnly, instructorOrAdmin, studentOrAdmin, authenticated } = require('../utils/roleBasedAuth');
 
-// GET all users - /api/users
-router.get('/', userController.getAllUsers);
+// Authentication routes (public)
+router.post('/login', authController.login);
+router.post('/register', authController.register);
 
-// GET user by ID - /api/users/:id
-router.get('/:id', userController.getUserById);
+// Self-service routes
+router.get('/profile', authenticated, userController.getLoggedInUser);
+router.put('/profile', authenticated, userController.updateLoggedInUser);
+router.delete('/profile', authenticated, userController.deleteLoggedInUser);
 
-// POST create new user - /api/users
-router.post('/', userController.createUser);
-
-// PUT update user by ID - /api/users/:id
-router.put('/:id', userController.updateUser);
-
-// DELETE user by ID - /api/users/:id
-router.delete('/:id', userController.deleteUser);
+// Admin-only user management routes
+router.get('/', adminOnly, userController.getAllUsers);
+router.post('/', adminOnly, userController.createUser);
+router.get('/:id', adminOnly, userController.getUserById);
+router.put('/:id', adminOnly, userController.updateUser);
+router.delete('/:id', adminOnly, userController.deleteUser);
 
 module.exports = router;

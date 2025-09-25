@@ -9,11 +9,14 @@ const instructorController = {
         try {
             const { title, description } = req.body;
             const instructorId = req.user.id;
+
             const newCourse = new Course({
                 title,
                 description,
-                instructor: instructorId
+                instructor: instructorId,
+                image: req.file ? req.file.path : null // Handle image upload
             });
+
             await newCourse.save();
             res.status(201).json({
                 status: "success",
@@ -21,10 +24,10 @@ const instructorController = {
                 data: newCourse
             });
         } catch (error) {
-            console.error("Error creating course:", error);
             res.status(500).json({
                 status: "error",
-                message: "Internal server error"
+                message: "Internal server error",
+                error: error.message
             });
         }
     },
@@ -52,15 +55,21 @@ const instructorController = {
             const instructorId = req.user.id;
             const { title, description } = req.body;
 
+            // Build update object
+            const updateData = {};
+            if (title) updateData.title = title;
+            if (description) updateData.description = description;
+            if (req.file) updateData.image = req.file.path; // Update image if new one uploaded
+
             const updatedCourse = await Course.findOneAndUpdate(
                 { _id: courseId, instructor: instructorId },
-                { title, description },
+                updateData,
                 { new: true }
             );
 
             if (!updatedCourse) {
                 return res.status(404).json({
-                    status: "error",
+                    status: "fail",
                     message: "Course not found or you are not authorized to update it"
                 });
             }
@@ -71,10 +80,10 @@ const instructorController = {
                 data: updatedCourse
             });
         } catch (error) {
-            console.error("Error updating course:", error);
             res.status(500).json({
                 status: "error",
-                message: "Internal server error"
+                message: "Internal server error",
+                error: error.message
             });
         }
     },

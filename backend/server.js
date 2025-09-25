@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/instructors', require('./routes/instructorRoutes'));
+app.use('/api/instructor', require('./routes/instructorRoutes'));
 // app.use('/api/courses', require('./routes/courseRoutes'));
 
 // Basic route

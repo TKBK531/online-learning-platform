@@ -36,7 +36,7 @@ const authorize = (...roles) => {
         if (!roles.includes(req.user.role)) {
             return res.status(403).json({
                 status: 'fail',
-                message: 'Access denied. Admin privileges required'
+                message: 'Access denied.'
             });
         }
         next();

@@ -83,6 +83,21 @@ const userController = {
     updateUser: async (req, res) => {
         try {
             const { name, email, role } = req.body;
+
+            if (email) {
+                const existingUser = await User.findOne({
+                    email,
+                    _id: { $ne: req.params.id } // Exclude current user from check
+                });
+
+                if (existingUser) {
+                    return res.status(400).json({
+                        status: "fail",
+                        message: "A user with this email already exists"
+                    });
+                }
+            }
+
             const updatedUser = await User.findByIdAndUpdate(
                 req.params.id,
                 { name, email, role },
@@ -107,6 +122,21 @@ const userController = {
     updateLoggedInUser: async (req, res) => {
         try {
             const { name, email } = req.body;
+
+            if (email) {
+                const existingUser = await User.findOne({
+                    email,
+                    _id: { $ne: req.user.id } // Exclude current user from check
+                });
+
+                if (existingUser) {
+                    return res.status(400).json({
+                        status: "fail",
+                        message: "A user with this email already exists"
+                    });
+                }
+            }
+
             const updatedUser = await User.findByIdAndUpdate(
                 req.user.id,
                 { name, email },

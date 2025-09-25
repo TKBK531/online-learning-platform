@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
+const authController = require('../controllers/authController');
 
 // GET all users - /api/users
 router.get('/', userController.getAllUsers);
@@ -15,10 +16,10 @@ router.post('/', userController.createUser);
 router.put('/:id', userController.updateUser);
 
 // DELETE user by ID - /api/users/:id
-router.delete('/:id', userController.deleteUser());
+router.delete('/:id', userController.deleteUser);
 
-// User Login - /api/users/login
-router.post('/login', userController.login);
-
+// Authentication routes
+router.post('/login', authController.login);
+router.post('/register', authController.register);
 
 module.exports = router;

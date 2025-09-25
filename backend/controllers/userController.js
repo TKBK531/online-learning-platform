@@ -82,10 +82,10 @@ const userController = {
     // Update user by ID
     updateUser: async (req, res) => {
         try {
-            const { name, email } = req.body;
+            const { name, email, role } = req.body;
             const updatedUser = await User.findByIdAndUpdate(
                 req.params.id,
-                { name, email },
+                { name, email, role },
                 { new: true }
             ).select('-password');
 

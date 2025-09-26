@@ -1,10 +1,30 @@
-const { auth, authorize } = require('../middleware/authMiddleware')
+const { auth, authorize } = require('../middleware/authMiddleware');
 
-// Middleware combinations
-const adminOnly = [auth, authorize('admin')];
-const instructorOrAdmin = [auth, authorize('instructor', 'admin')];
-const studentOrAdmin = [auth, authorize('student', 'admin')];
-const authenticated = [auth];
+// Composed middleware functions
+const adminOnly = async (req, res, next) => {
+    auth(req, res, (err) => {
+        if (err) return next(err);
+        authorize('admin')(req, res, next);
+    });
+};
+
+const instructorOrAdmin = async (req, res, next) => {
+    auth(req, res, (err) => {
+        if (err) return next(err);
+        authorize('instructor', 'admin')(req, res, next);
+    });
+};
+
+const studentOrAdmin = async (req, res, next) => {
+    auth(req, res, (err) => {
+        if (err) return next(err);
+        authorize('student', 'admin')(req, res, next);
+    });
+};
+
+const authenticated = async (req, res, next) => {
+    auth(req, res, next);
+};
 
 module.exports = {
     adminOnly,

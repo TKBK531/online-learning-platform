@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const Enrollment = require('../models/Enrollment');
 
 const courseController = {
     // Get all courses
@@ -42,6 +43,25 @@ const courseController = {
             });
         }
     },
+
+    //Get enrollments for a specific course
+    getEnrollments: async (req, res) => {
+        try {
+            const courseId = req.params.id;
+            const enrollments = await Enrollment.find({ course: courseId, status: 'enrolled' }).populate('student');
+            res.status(200).json({
+                status: "success",
+                message: "Enrollments fetched successfully",
+                data: enrollments
+            });
+        } catch (error) {
+            console.error("Error fetching enrollments:", error);
+            res.status(500).json({
+                status: "error",
+                message: "Internal server error"
+            });
+        }
+    }
 };
 
 module.exports = courseController;

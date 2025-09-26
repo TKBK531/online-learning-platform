@@ -11,6 +11,7 @@ router.use(studentOrAdmin);
 router.post('/courses/:id/enroll', studentController.enrollInCourse);
 router.get('/courses', studentController.getEnrolledCourses);
 router.post('/courses/:id/drop', studentController.dropCourse);
-// router.post('/courses/:id/complete', studentController.completeCourse);
+router.post('/courses/:id/complete', studentController.completeCourse);
+router.get('/courses/completed', studentController.getCompletedCourses);
 
 module.exports = router;

@@ -111,6 +111,55 @@ const studentController = {
             });
         }
     },
+
+    // Complete a course
+    completeCourse: async (req, res) => {
+        try {
+            const courseId = req.params.id;
+            const studentId = req.user.id;
+            const enrollment = await Enrollment.findOne(
+                { student: studentId, course: courseId, status: 'enrolled' }
+            );
+            if (!enrollment) {
+                return res.status(404).json({
+                    status: "fail",
+                    message: "You are not enrolled in this course"
+                });
+            }
+            enrollment.status = 'completed';
+            await enrollment.save();
+            res.status(200).json({
+                status: "success",
+                message: "Course completed successfully"
+            });
+        } catch (error) {
+            console.error("Error completing course:", error);
+            res.status(500).json({
+                status: "error",
+                message: "Internal server error"
+            });
+        }
+    },
+
+    //Get all completed courses
+    getCompletedCourses: async (req, res) => {
+        try {
+            const studentId = req.user.id;
+            const enrollments = await Enrollment.find({ student: studentId, status: 'completed' }).populate('course');
+            res.status(200).json({
+                status: "success",
+                message: "Completed courses fetched successfully",
+                data: enrollments
+            });
+        } catch (error) {
+            console.error("Error fetching completed courses:", error);
+            res.status(500).json({
+                status: "error",
+                message: "Internal server error"
+            });
+        }
+    }
+
 };
 
 module.exports = studentController;

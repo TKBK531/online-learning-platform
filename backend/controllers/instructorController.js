@@ -87,6 +87,7 @@ const instructorController = {
             });
         }
     },
+
     // Delete a course
     deleteCourse: async (req, res) => {
         try {

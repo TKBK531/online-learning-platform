@@ -68,7 +68,7 @@ const studentController = {
     getEnrolledCourses: async (req, res) => {
         try {
             const studentId = req.user.id;
-            const enrollments = await Enrollment.find({ student: studentId }).populate('course');
+            const enrollments = await Enrollment.find({ student: studentId, status: 'enrolled' }).populate('course');
             res.status(200).json({
                 status: "success",
                 message: "Enrolled courses fetched successfully",

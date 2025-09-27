@@ -317,10 +317,10 @@ const Chat = () => {
                                     <div className={`max-w-3xl flex items-start space-x-3 ${message.type === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
                                         {/* Avatar */}
                                         <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${message.type === 'user'
-                                                ? 'bg-blue-600'
-                                                : message.type === 'error'
-                                                    ? 'bg-red-500'
-                                                    : 'bg-gradient-to-r from-indigo-500 to-purple-600'
+                                            ? 'bg-blue-600'
+                                            : message.type === 'error'
+                                                ? 'bg-red-500'
+                                                : 'bg-gradient-to-r from-indigo-500 to-purple-600'
                                             }`}>
                                             <span className="text-white text-sm font-semibold">
                                                 {message.type === 'user'
@@ -334,20 +334,20 @@ const Chat = () => {
 
                                         {/* Message Bubble */}
                                         <div className={`rounded-2xl px-4 py-3 ${message.type === 'user'
-                                                ? 'bg-blue-600 text-white'
-                                                : message.type === 'error'
-                                                    ? 'bg-red-50 text-red-900 border border-red-200'
-                                                    : 'bg-gray-100 text-gray-900'
+                                            ? 'bg-blue-600 text-white'
+                                            : message.type === 'error'
+                                                ? 'bg-red-50 text-red-900 border border-red-200'
+                                                : 'bg-gray-100 text-gray-900'
                                             }`}>
                                             <div className="space-y-2">
                                                 <p className="text-sm leading-relaxed whitespace-pre-wrap">
                                                     {message.content}
                                                 </p>
                                                 <p className={`text-xs ${message.type === 'user'
-                                                        ? 'text-blue-100'
-                                                        : message.type === 'error'
-                                                            ? 'text-red-500'
-                                                            : 'text-gray-500'
+                                                    ? 'text-blue-100'
+                                                    : message.type === 'error'
+                                                        ? 'text-red-500'
+                                                        : 'text-gray-500'
                                                     }`}>
                                                     {formatTimestamp(message.timestamp)}
                                                 </p>

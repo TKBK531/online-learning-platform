@@ -4,19 +4,18 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
-import { Alert, AlertDescription } from '../components/ui/alert';
 import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
+import { useToast } from '../hooks/use-toast';
 import api from '../services/api';
 
 const Courses = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const { toast } = useToast();
     const [courses, setCourses] = useState([]);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
 
     // Create course form state (for instructors)
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -34,7 +33,6 @@ const Courses = () => {
         console.log('🚀 fetchData called');
         try {
             setLoading(true);
-            setError('');
 
             console.log('👤 Current user:', user);
             console.log('🔐 User role:', user?.role);
@@ -99,11 +97,15 @@ const Courses = () => {
             console.error('Error fetching data:', error);
             console.error('Error details:', error.response?.data);
             console.error('Error status:', error.response?.status);
-            setError(`Failed to load courses: ${error.response?.data?.message || error.message}`);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: `Failed to load courses: ${error.response?.data?.message || error.message}`,
+            });
         } finally {
             setLoading(false);
         }
-    }, [user]);
+    }, [user, toast]);
 
     useEffect(() => {
         fetchData();
@@ -112,26 +114,36 @@ const Courses = () => {
     const handleCreateCourse = async (e) => {
         e.preventDefault();
         if (!newCourse.title.trim() || !newCourse.description.trim()) {
-            setError('Please fill in all fields');
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Please fill in all fields",
+            });
             return;
         }
 
         try {
             setCreateLoading(true);
-            setError('');
-            setSuccess('');
 
             const response = await api.post('/instructor/courses', newCourse);
 
             if (response.data.status === 'success') {
-                setSuccess('Course created successfully!');
+                toast({
+                    variant: "success",
+                    title: "Success",
+                    description: "Course created successfully!",
+                });
                 setNewCourse({ title: '', description: '' });
                 setShowCreateForm(false);
                 fetchData(); // Refresh the courses list
             }
         } catch (error) {
             console.error('Error creating course:', error);
-            setError(error.response?.data?.message || 'Failed to create course');
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to create course',
+            });
         } finally {
             setCreateLoading(false);
         }
@@ -143,35 +155,45 @@ const Courses = () => {
         }
 
         try {
-            setError('');
-            setSuccess('');
-
             const response = await api.delete(`/instructor/courses/${courseId}`);
 
             if (response.data.status === 'success') {
-                setSuccess('Course deleted successfully!');
+                toast({
+                    variant: "success",
+                    title: "Success",
+                    description: "Course deleted successfully!",
+                });
                 fetchData(); // Refresh the courses list
             }
         } catch (error) {
             console.error('Error deleting course:', error);
-            setError(error.response?.data?.message || 'Failed to delete course');
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to delete course',
+            });
         }
     };
 
     const handleEnrollCourse = async (courseId) => {
         try {
-            setError('');
-            setSuccess('');
-
             const response = await api.post(`/student/courses/${courseId}/enroll`);
 
             if (response.data.status === 'success') {
-                setSuccess('Successfully enrolled in course!');
+                toast({
+                    variant: "success",
+                    title: "Success",
+                    description: "Successfully enrolled in course!",
+                });
                 setEnrolledCourses([...enrolledCourses, courseId]);
             }
         } catch (error) {
             console.error('Error enrolling in course:', error);
-            setError(error.response?.data?.message || 'Failed to enroll in course');
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to enroll in course',
+            });
         }
     };
 
@@ -181,18 +203,23 @@ const Courses = () => {
         }
 
         try {
-            setError('');
-            setSuccess('');
-
             const response = await api.post(`/student/courses/${courseId}/drop`);
 
             if (response.data.status === 'success') {
-                setSuccess('Successfully unenrolled from course!');
+                toast({
+                    variant: "success",
+                    title: "Success",
+                    description: "Successfully unenrolled from course!",
+                });
                 setEnrolledCourses(enrolledCourses.filter(id => id !== courseId));
             }
         } catch (error) {
             console.error('Error unenrolling from course:', error);
-            setError(error.response?.data?.message || 'Failed to unenroll from course');
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: error.response?.data?.message || 'Failed to unenroll from course',
+            });
         }
     };
 
@@ -690,19 +717,6 @@ const Courses = () => {
 
             {/* Main Content */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                {/* Messages */}
-                {error && (
-                    <Alert variant="destructive" className="mb-6">
-                        <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                )}
-
-                {success && (
-                    <Alert className="mb-6 border-green-200 bg-green-50">
-                        <AlertDescription className="text-green-800">{success}</AlertDescription>
-                    </Alert>
-                )}
-
                 {/* Render appropriate view based on user role */}
                 {user?.role === 'instructor' && renderInstructorView()}
                 {user?.role === 'student' && renderStudentView()}

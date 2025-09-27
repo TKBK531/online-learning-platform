@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Badge } from '../components/ui/badge';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -87,27 +86,6 @@ const Login = () => {
                     <h1 className="text-3xl font-bold text-gray-900">LearnHub Academy</h1>
                     <p className="mt-2 text-gray-600">Sign in to your account</p>
                 </div>
-
-                {/* Demo Credentials */}
-                <Card className="bg-blue-50 border-blue-200">
-                    <CardHeader className="pb-3">
-                        <CardTitle className="text-sm text-blue-800">Demo Credentials</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                        <div className="flex items-center justify-between">
-                            <span className="text-blue-700">Admin:</span>
-                            <Badge variant="outline" className="text-xs">admin@demo.com / admin123</Badge>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-blue-700">Instructor:</span>
-                            <Badge variant="outline" className="text-xs">instructor@demo.com / instructor123</Badge>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <span className="text-blue-700">Student:</span>
-                            <Badge variant="outline" className="text-xs">student@demo.com / student123</Badge>
-                        </div>
-                    </CardContent>
-                </Card>
 
                 {/* Login Form */}
                 <Card>

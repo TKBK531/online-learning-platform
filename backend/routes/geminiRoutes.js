@@ -7,5 +7,6 @@ const { authenticated } = require('../utils/roleBasedAuth');
 
 router.get('/usage', authenticated, geminiController.getApiUsage);
 router.post('/generate', authenticated, geminiController.generateResponse);
+router.get('/history', authenticated, geminiController.getChatHistory);
 
 module.exports = router;

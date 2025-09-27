@@ -117,7 +117,13 @@ const Dashboard = () => {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <Button variant="outline" className="h-12 font-medium hover:bg-blue-50 hover:border-blue-300 transition-colors">👥 Manage Users</Button>
+                        <Button
+                            variant="outline"
+                            className="h-12 font-medium hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                            onClick={() => navigate('/courses')}
+                        >
+                            📚 View Courses
+                        </Button>
                         <Button variant="outline" className="h-12 font-medium hover:bg-green-50 hover:border-green-300 transition-colors">📈 Course Analytics</Button>
                         <Button variant="outline" className="h-12 font-medium hover:bg-yellow-50 hover:border-yellow-300 transition-colors">📋 System Logs</Button>
                         <Button variant="outline" className="h-12 font-medium hover:bg-purple-50 hover:border-purple-300 transition-colors">⚙️ Settings</Button>
@@ -278,7 +284,12 @@ const Dashboard = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <Button className="h-12 font-medium bg-emerald-600 hover:bg-emerald-700 transition-colors">➕ Create New Course</Button>
+                            <Button
+                                className="h-12 font-medium bg-emerald-600 hover:bg-emerald-700 transition-colors"
+                                onClick={() => navigate('/courses')}
+                            >
+                                📚 Manage Courses
+                            </Button>
                             <Button variant="outline" className="h-12 font-medium hover:bg-emerald-50 hover:border-emerald-300 transition-colors">📊 Course Analytics</Button>
                             <Button variant="outline" className="h-12 font-medium hover:bg-emerald-50 hover:border-emerald-300 transition-colors">💬 Student Messages</Button>
                         </div>
@@ -456,7 +467,12 @@ const Dashboard = () => {
                     </CardHeader>
                     <CardContent>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Button className="h-12 font-medium bg-orange-600 hover:bg-orange-700 transition-colors">🔍 Browse Courses</Button>
+                            <Button
+                                className="h-12 font-medium bg-orange-600 hover:bg-orange-700 transition-colors"
+                                onClick={() => navigate('/courses')}
+                            >
+                                🔍 Browse Courses
+                            </Button>
                             <Button variant="outline" className="h-12 font-medium hover:bg-orange-50 hover:border-orange-300 transition-colors">📋 View Assignments</Button>
                         </div>
                     </CardContent>
@@ -514,6 +530,24 @@ const Dashboard = () => {
                             <Badge className={getRoleColor(user?.role)}>
                                 {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
                             </Badge>
+                        </div>
+                        <div className="flex items-center space-x-6">
+                            <nav className="hidden md:flex items-center space-x-4">
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => navigate('/dashboard')}
+                                    className="text-sm font-medium"
+                                >
+                                    Dashboard
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => navigate('/courses')}
+                                    className="text-sm font-medium"
+                                >
+                                    Courses
+                                </Button>
+                            </nav>
                         </div>
                         <div className="flex items-center space-x-4">
                             <span className="text-sm text-gray-600">

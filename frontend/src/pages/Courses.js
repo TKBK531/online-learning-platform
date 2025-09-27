@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Badge } from '../components/ui/badge';
 import { useToast } from '../hooks/use-toast';
+import ConfirmDialog from '../components/ConfirmDialog';
 import api from '../services/api';
 
 const Courses = () => {
@@ -16,6 +17,17 @@ const Courses = () => {
     const [courses, setCourses] = useState([]);
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    // Confirmation dialog state
+    const [confirmDialog, setConfirmDialog] = useState({
+        isOpen: false,
+        title: '',
+        description: '',
+        confirmText: 'Confirm',
+        variant: 'destructive',
+        onConfirm: null,
+        loading: false
+    });
 
     // Create course form state (for instructors)
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -28,6 +40,47 @@ const Courses = () => {
     // Filter states
     const [instructorFilter, setInstructorFilter] = useState('all-courses'); // 'all-courses', 'my-courses'
     const [studentFilter, setStudentFilter] = useState('all'); // 'all', 'enrolled', 'available'
+
+    // Helper functions for confirmation dialogs
+    const openConfirmDialog = (title, description, onConfirm, confirmText = 'Confirm', variant = 'destructive') => {
+        setConfirmDialog({
+            isOpen: true,
+            title,
+            description,
+            confirmText,
+            variant,
+            onConfirm,
+            loading: false
+        });
+    };
+
+    const closeConfirmDialog = () => {
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+    };
+
+    const setConfirmLoading = (loading) => {
+        setConfirmDialog(prev => ({ ...prev, loading }));
+    };
+
+    const handleCancelCreateForm = () => {
+        const hasData = newCourse.title.trim() || newCourse.description.trim();
+
+        if (hasData) {
+            openConfirmDialog(
+                'Cancel Course Creation',
+                'Are you sure you want to cancel? All entered information will be lost.',
+                () => {
+                    setNewCourse({ title: '', description: '' });
+                    setShowCreateForm(false);
+                    closeConfirmDialog();
+                },
+                'Yes, Cancel',
+                'destructive'
+            );
+        } else {
+            setShowCreateForm(false);
+        }
+    };
 
     const fetchData = useCallback(async () => {
         console.log('🚀 fetchData called');
@@ -149,12 +202,19 @@ const Courses = () => {
         }
     };
 
-    const handleDeleteCourse = async (courseId) => {
-        if (!window.confirm('Are you sure you want to delete this course?')) {
-            return;
-        }
+    const handleDeleteCourse = (courseId, courseTitle) => {
+        openConfirmDialog(
+            'Delete Course',
+            `Are you sure you want to delete "${courseTitle}"? This action cannot be undone and will permanently remove the course and all its content.`,
+            () => confirmDeleteCourse(courseId),
+            'Delete Course',
+            'destructive'
+        );
+    };
 
+    const confirmDeleteCourse = async (courseId) => {
         try {
+            setConfirmLoading(true);
             const response = await api.delete(`/instructor/courses/${courseId}`);
 
             if (response.data.status === 'success') {
@@ -164,6 +224,7 @@ const Courses = () => {
                     description: "Course deleted successfully!",
                 });
                 fetchData(); // Refresh the courses list
+                closeConfirmDialog();
             }
         } catch (error) {
             console.error('Error deleting course:', error);
@@ -172,11 +233,23 @@ const Courses = () => {
                 title: "Error",
                 description: error.response?.data?.message || 'Failed to delete course',
             });
+            setConfirmLoading(false);
         }
     };
 
-    const handleEnrollCourse = async (courseId) => {
+    const handleEnrollCourse = (courseId, courseTitle) => {
+        openConfirmDialog(
+            'Enroll in Course',
+            `Are you sure you want to enroll in "${courseTitle}"? You will gain access to all course materials and can start learning immediately.`,
+            () => confirmEnrollCourse(courseId),
+            'Enroll Now',
+            'default'
+        );
+    };
+
+    const confirmEnrollCourse = async (courseId) => {
         try {
+            setConfirmLoading(true);
             const response = await api.post(`/student/courses/${courseId}/enroll`);
 
             if (response.data.status === 'success') {
@@ -186,6 +259,7 @@ const Courses = () => {
                     description: "Successfully enrolled in course!",
                 });
                 setEnrolledCourses([...enrolledCourses, courseId]);
+                closeConfirmDialog();
             }
         } catch (error) {
             console.error('Error enrolling in course:', error);
@@ -194,15 +268,23 @@ const Courses = () => {
                 title: "Error",
                 description: error.response?.data?.message || 'Failed to enroll in course',
             });
+            setConfirmLoading(false);
         }
     };
 
-    const handleUnenrollCourse = async (courseId) => {
-        if (!window.confirm('Are you sure you want to unenroll from this course?')) {
-            return;
-        }
+    const handleUnenrollCourse = (courseId, courseTitle) => {
+        openConfirmDialog(
+            'Unenroll from Course',
+            `Are you sure you want to unenroll from "${courseTitle}"? You will lose access to all course materials and your progress will be saved.`,
+            () => confirmUnenrollCourse(courseId),
+            'Unenroll',
+            'destructive'
+        );
+    };
 
+    const confirmUnenrollCourse = async (courseId) => {
         try {
+            setConfirmLoading(true);
             const response = await api.post(`/student/courses/${courseId}/drop`);
 
             if (response.data.status === 'success') {
@@ -212,6 +294,7 @@ const Courses = () => {
                     description: "Successfully unenrolled from course!",
                 });
                 setEnrolledCourses(enrolledCourses.filter(id => id !== courseId));
+                closeConfirmDialog();
             }
         } catch (error) {
             console.error('Error unenrolling from course:', error);
@@ -220,6 +303,7 @@ const Courses = () => {
                 title: "Error",
                 description: error.response?.data?.message || 'Failed to unenroll from course',
             });
+            setConfirmLoading(false);
         }
     };
 
@@ -333,7 +417,7 @@ const Courses = () => {
                                 <Button
                                     type="button"
                                     variant="outline"
-                                    onClick={() => setShowCreateForm(false)}
+                                    onClick={() => handleCancelCreateForm()}
                                 >
                                     Cancel
                                 </Button>
@@ -364,7 +448,7 @@ const Courses = () => {
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => handleDeleteCourse(course._id)}
+                                        onClick={() => handleDeleteCourse(course._id, course.title)}
                                         className="bg-white/90 border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50 backdrop-blur-sm"
                                     >
                                         🗑️ Delete
@@ -515,14 +599,14 @@ const Courses = () => {
                                     {isEnrolled(course._id) ? (
                                         <Button
                                             variant="outline"
-                                            onClick={() => handleUnenrollCourse(course._id)}
+                                            onClick={() => handleUnenrollCourse(course._id, course.title)}
                                             className="w-full border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50 hover:border-red-300 transition-all"
                                         >
                                             📤 Unenroll from Course
                                         </Button>
                                     ) : (
                                         <Button
-                                            onClick={() => handleEnrollCourse(course._id)}
+                                            onClick={() => handleEnrollCourse(course._id, course.title)}
                                             className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold py-3 shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                                         >
                                             🚀 Enroll Now
@@ -722,6 +806,18 @@ const Courses = () => {
                 {user?.role === 'student' && renderStudentView()}
                 {user?.role === 'admin' && renderAdminView()}
             </div>
+
+            {/* Confirmation Dialog */}
+            <ConfirmDialog
+                isOpen={confirmDialog.isOpen}
+                onClose={closeConfirmDialog}
+                onConfirm={confirmDialog.onConfirm}
+                title={confirmDialog.title}
+                description={confirmDialog.description}
+                confirmText={confirmDialog.confirmText}
+                variant={confirmDialog.variant}
+                loading={confirmDialog.loading}
+            />
         </div>
     );
 };

@@ -4,6 +4,52 @@ const CourseContent = require('../models/CourseContent');
 const Enrollment = require('../models/Enrollment');
 
 const instructorController = {
+    // Get instructor dashboard statistics
+    getDashboardStats: async (req, res) => {
+        try {
+            const instructorId = req.user.id;
+
+            // Get all courses by this instructor
+            const courses = await Course.find({ instructor: instructorId });
+            const courseIds = courses.map(course => course._id);
+
+            // Count published and draft courses
+            const publishedCourses = courses.filter(course => course.status === 'published' || !course.status).length;
+            const draftCourses = courses.filter(course => course.status === 'draft').length;
+
+            // Count total students enrolled in instructor's courses
+            const enrollments = await Enrollment.find({ course: { $in: courseIds } });
+            const totalStudents = new Set(enrollments.map(enrollment => enrollment.student.toString())).size;
+
+            // Count this month's enrollments
+            const currentMonth = new Date();
+            currentMonth.setDate(1);
+            const thisMonthEnrollments = await Enrollment.countDocuments({
+                course: { $in: courseIds },
+                createdAt: { $gte: currentMonth }
+            });
+
+            const stats = {
+                publishedCourses,
+                draftCourses,
+                totalStudents,
+                thisMonthEnrollments
+            };
+
+            res.status(200).json({
+                status: 'success',
+                data: stats
+            });
+        } catch (error) {
+            console.error('Error fetching instructor dashboard stats:', error);
+            res.status(500).json({
+                status: 'error',
+                message: 'Internal server error',
+                error: error.message
+            });
+        }
+    },
+
     // Create a new course
     createCourse: async (req, res) => {
         try {

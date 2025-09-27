@@ -158,6 +158,46 @@ const studentController = {
                 message: "Internal server error"
             });
         }
+    },
+
+    // Get dashboard statistics
+    getDashboardStats: async (req, res) => {
+        try {
+            const studentId = req.user.id;
+
+            // Get enrolled courses count
+            const enrolledCount = await Enrollment.countDocuments({
+                student: studentId,
+                status: 'enrolled'
+            });
+
+            // Get completed courses count
+            const completedCount = await Enrollment.countDocuments({
+                student: studentId,
+                status: 'completed'
+            });
+
+            // Calculate overall progress
+            const totalCourses = enrolledCount + completedCount;
+            const overallProgress = totalCourses > 0 ? Math.round((completedCount / totalCourses) * 100) : 0;
+
+            res.status(200).json({
+                status: "success",
+                message: "Dashboard statistics fetched successfully",
+                data: {
+                    enrolledCourses: enrolledCount,
+                    completedCourses: completedCount,
+                    overallProgress,
+                    upcomingActivities: 5 // Dummy data as requested
+                }
+            });
+        } catch (error) {
+            console.error("Error fetching dashboard stats:", error);
+            res.status(500).json({
+                status: "error",
+                message: "Internal server error"
+            });
+        }
     }
 
 };

@@ -18,6 +18,8 @@ app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/instructor', require('./routes/instructorRoutes'));
 app.use('/api/student', require('./routes/studentRoutes'));
 app.use('/api/courses', require('./routes/courseRoutes'));
+app.use('/api/gemini', require('./routes/geminiRoutes'));
+app.use('/api/gpt', require('./routes/gptRoutes'));
 
 // Basic route
 app.get('/', (req, res) => {

@@ -547,6 +547,13 @@ const Dashboard = () => {
                                 >
                                     Courses
                                 </Button>
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => navigate('/chat')}
+                                    className="text-sm font-medium"
+                                >
+                                    🤖 AI Chat
+                                </Button>
                             </nav>
                         </div>
                         <div className="flex items-center space-x-4">

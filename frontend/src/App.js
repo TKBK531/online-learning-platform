@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
+import Chat from './pages/Chat';
+import FloatingChatButton from './components/FloatingChatButton';
 import { Toaster } from './hooks/use-toast';
 import './App.css';
 
@@ -36,6 +38,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <Chat />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Default redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -44,6 +54,7 @@ function App() {
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </div>
+        <FloatingChatButton />
         <Toaster />
       </AuthProvider>
     </Router>

@@ -1,7 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config();
+
+// Load environment variables from root .env file
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const connectDB = require('./config/db');
 
@@ -11,7 +13,12 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' 
+        ? true // Allow all origins in production for now
+        : ['http://localhost:3000'],
+    credentials: true
+}));
 app.use(express.json());
 
 // API Routes
@@ -27,8 +34,8 @@ if (process.env.NODE_ENV === 'production') {
     // Serve static files from the React app build directory
     app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-    // Handle React routing, return all requests to React app
-    app.get('*', (req, res) => {
+    // Handle React routing - catch all non-API routes and return React app
+    app.get(/^(?!\/api).*/, (req, res) => {
         res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
     });
 } else {
